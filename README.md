@@ -60,7 +60,7 @@ $$H_{eff}(\mathbf{x}) = H_0(\mathbf{x}) - \sum_{r \in Receptors} \lambda_r \cdot
 
 $$\langle \mathbf{x} \rangle_{model} = \sum \mathbf{x} \cdot P(\mathbf{x} | H_0, \Phi^{(t)})$$
 
-这一步可以通过MCMC采样或变分推断近似计算。
+  这一步可以通过MCMC采样或变分推断近似计算。
 
 3. **校正 (Correction/Self-Consistency):** 比较预测表达谱 $\langle \mathbf{x} \rangle_{model}$ 与真实的组织来源肿瘤细胞表达谱 $\langle \mathbf{x} \rangle_{tissue}$。
    
@@ -74,7 +74,7 @@ $$\Phi^{(t+1)} = \Phi^{(t)} - \eta \frac{\partial \mathcal{L}}{\partial \Phi}$$
 
 5. **收敛：** 当 $\Delta \Phi$ 小于阈值时停止。此时的 $\Phi^*$ 即为**重构出的TME关键互作场**。
 
-#### 3.4：关键因素解析 (Decoupling)
+#### 3.4：结果解析 (Decoupling)
 
 算法收敛后，我们得到最终的 $\Phi^*_r$（针对每个受体的有效场强），可以：
 
