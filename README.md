@@ -82,3 +82,50 @@ $$\Phi^{(t+1)} = \Phi^{(t)} - \eta \frac{\partial \mathcal{L}}{\partial \Phi}$$
 * **溯源关键细胞：** 将 $\Phi^*_r$ 分解回细胞来源 $\sum w_k L_{k,r}$。
   * 如果 $\Phi^*_r$ 很高，且主要由成纤维细胞的配体贡献，则推断"成纤维细胞-肿瘤细胞互作"是导致肿瘤从“细胞系状态”向“组织状态”转变的主因。
 
+----
+
+## 使用示例（Demo Usage）
+
+1. 生成示例数据：
+
+默认情况下，生成200个基因，细胞系培养条件下800个细胞和组织环境下的3000个细胞表达谱
+
+```python
+X_vac, X_tissue, h_gt, active_idx = generate_robust_synthetic_data()
+```
+2. SCF算法求解
+
+```python
+candidate_receptors = list(set(list(active_idx) + list(np.random.choice(200, 45, replace=False))))
+solver = scSCF_Solver(X_vac, X_tissue, [f"Gene_{i}" for i in range(200)])
+solver.define_mask(candidate_receptors)
+h_pred = solver.train(epochs=600, lr=0.05, l1_lambda=0.3)
+```
+
+3. 结果可视化
+
+```python
+plt.figure(figsize=(10, 4))
+
+# 1: 计算场强与Ground Truth对比
+plt.subplot(1, 2, 1)
+plt.scatter(h_gt, h_pred, alpha=0.6, color='teal')
+plt.xlabel("Ground Truth Field ($h_{gt}$)")
+plt.ylabel("Predicted Field ($h_{pred}$)")
+plt.title("Field Recovery Accuracy")
+plt.plot([0, 5], [0, 5], '--', color='red') # 对角线
+
+# 2: Top 基因识别情况
+plt.subplot(1, 2, 2)
+df_res = pd.DataFrame({'GT': h_gt, 'Pred': h_pred})
+df_res = df_res.sort_values('Pred', ascending=False).head(20)
+colors = ['red' if x > 0 else 'gray' for x in df_res['GT']]
+plt.bar(range(20), df_res['Pred'], color=colors)
+plt.title("Top 20 Predicted Interaction Channels\n(Red = True Positives)")
+plt.xlabel("Rank")
+plt.ylabel("Field Intensity")
+
+plt.tight_layout()
+plt.savefig('demo_results.png', dpi=300, bbox_inches='tight') 
+plt.show()
+```
