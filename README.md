@@ -129,3 +129,6 @@ plt.tight_layout()
 plt.savefig('demo_results.png', dpi=300, bbox_inches='tight') 
 plt.show()
 ```
+
+![示例结果](example/demo_results.png "图1: （左）计算场强与真实值对比；（右）模型预测的Top 20基因，红色为真阳性结果")
+
