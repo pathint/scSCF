@@ -25,7 +25,7 @@ Self-consistent field solver for cell - signaling field interactions based on si
 
 #### 3.1：构建基态哈密顿量 ($H_0$)
 
-利用 $D_{vac}$（细胞系数据），构建肿瘤细胞的内在基因共表达概率分布。基于最大熵原理（MaxEnt），细胞处于某一基因表达状态 $\mathbf{x}$ 的概率为：
+利用 $D_{vac}$（细胞系数据），构建肿瘤细胞的内在基因共表达概率分布。基于最大熵原理，细胞处于某一基因表达状态 $\mathbf{x}$ 的概率为：
 
 $$P_0(\mathbf{x}) = \frac{1}{Z_0} \exp(-H_0(\mathbf{x}))$$
 
@@ -46,9 +46,9 @@ $$H_{eff}(\mathbf{x}) = H_0(\mathbf{x}) - \sum_{r \in Receptors} \lambda_r \cdot
 
 * $x_r$: 肿瘤细胞中受体基因 $r$ 的表达量（或其下游靶基因的集合）。
 * $\phi_r$: 平均场强度。这是我们试图求解的核心。它代表了环境中有多少配体能够激活受体 $r$。
-* $\phi_r \approx \sum_{k \in CellTypes} w_k \cdot L_{k,r}$
-* $L_{k,r}$: 细胞类型 $k$ 表达配体的平均水平。
-* $w_k$: 细胞类型 $k$ 在微环境中的密度/空间邻近度。
+  * $\phi_r \approx \sum_{k \in CellTypes} w_k \cdot L_{k,r}$
+  * $L_{k,r}$: 细胞类型 $k$ 表达配体的平均水平。
+  * $w_k$: 细胞类型 $k$ 在微环境中的密度/空间邻近度。
 * $\lambda_r$: 耦合常数（Susceptibility），表示受体 $r$ 被激活后对整个转录组 $\mathbf{x}$ 的扰动能力。
 
 #### 3.3：自洽场迭代 (SCF Iteration)
@@ -72,7 +72,7 @@ $$\mathcal{L} = || \langle \mathbf{x} \rangle_{model} - \langle \mathbf{x} \rang
 
 $$\Phi^{(t+1)} = \Phi^{(t)} - \eta \frac{\partial \mathcal{L}}{\partial \Phi}$$
 
-5. **收敛：** 当 $\Delta \Phi$ 小于阈值时停止。此时的 $\Phi^*$ 即为**重构出的TME关键互作场**。
+5. **收敛：** 当 $\Delta \Phi$ 小于阈值时停止。此时的 $\Phi^*$ 即为重构出的TME关键互作场。
 
 #### 3.4：结果解析 (Decoupling)
 
@@ -80,5 +80,5 @@ $$\Phi^{(t+1)} = \Phi^{(t)} - \eta \frac{\partial \mathcal{L}}{\partial \Phi}$$
 
 * **识别关键受体：** $\Phi^*_r$ 值最大的受体即为介导TME影响的关键通道。
 * **溯源关键细胞：** 将 $\Phi^*_r$ 分解回细胞来源 $\sum w_k L_{k,r}$。
-* 如果 $\Phi^*_r$ 很高，且主要由成纤维细胞的配体贡献，则推断**成纤维细胞-肿瘤细胞互作**是导致肿瘤从“细胞系状态”向“组织状态”转变的主因。
+  * 如果 $\Phi^*_r$ 很高，且主要由成纤维细胞的配体贡献，则推断"成纤维细胞-肿瘤细胞互作"是导致肿瘤从“细胞系状态”向“组织状态”转变的主因。
 
