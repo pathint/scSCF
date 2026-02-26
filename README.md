@@ -29,7 +29,7 @@ Self-consistent field solver for cell - signaling field interactions based on si
 
 $$P_0(\mathbf{x}) = \frac{1}{Z_0} \exp(-H_0(\mathbf{x}))$$
 
-其中，$H_0$ 可采用类似 Ising 模型或 Gaussian Graphical Model 的形式，描述基因间的内在耦合：
+其中， $H_0$ 可采用类似 Ising 模型或 Gaussian Graphical Model 的形式，描述基因间的内在耦合：
 
 $$H_0(\mathbf{x}) = -\sum_i h_i x_i - \sum J_{ij} x_i x_j$$
 
@@ -50,4 +50,35 @@ $$H_{eff}(\mathbf{x}) = H_0(\mathbf{x}) - \sum_{r \in Receptors} \lambda_r \cdot
 * $L_{k,r}$: 细胞类型 $k$ 表达配体的平均水平。
 * $w_k$: 细胞类型 $k$ 在微环境中的密度/空间邻近度。
 * $\lambda_r$: 耦合常数（Susceptibility），表示受体 $r$ 被激活后对整个转录组 $\mathbf{x}$ 的扰动能力。
+
+#### 3.3：自洽场迭代 (SCF Iteration)
+
+我们的目标是找到一组最优的场参数 $\{\phi_r\}$ 和响应系数 $\{\lambda_r\}$，使得重构出的分布 $P_{eff}$ 最接近真实的组织内肿瘤细胞分布 $P_{tissue}$。
+
+1. **初始化：** 设定初始场 $\Phi^{(0)}$ 为 0 或随机小量。
+2. **预测 (Prediction):** 基于当前场 $\Phi^{(t)}$，计算理论上的肿瘤细胞表达谱期望值：
+
+$$\langle \mathbf{x} \rangle_{model} = \sum \mathbf{x} \cdot P(\mathbf{x} | H_0, \Phi^{(t)})$$
+
+这一步可以通过MCMC采样或变分推断近似计算。
+
+3. **校正 (Correction/Self-Consistency):** 比较预测表达谱 $\langle \mathbf{x} \rangle_{model}$ 与真实的组织来源肿瘤细胞表达谱 $\langle \mathbf{x} \rangle_{tissue}$。
+   
+* 计算误差函数（如 KL 散度或欧氏距离）：
+
+$$\mathcal{L} = || \langle \mathbf{x} \rangle_{model} - \langle \mathbf{x} \rangle_{tissue} ||^2$$
+
+4. **更新场 (Update):** 利用梯度下降法更新场强度，使其满足自洽条件：
+
+$$\Phi^{(t+1)} = \Phi^{(t)} - \eta \frac{\partial \mathcal{L}}{\partial \Phi}$$
+
+5. **收敛：** 当 $\Delta \Phi$ 小于阈值时停止。此时的 $\Phi^*$ 即为**重构出的TME关键互作场**。
+
+#### 3.4：关键因素解析 (Decoupling)
+
+算法收敛后，我们得到最终的 $\Phi^*_r$（针对每个受体的有效场强），可以：
+
+* **识别关键受体：** $\Phi^*_r$ 值最大的受体即为介导TME影响的关键通道。
+* **溯源关键细胞：** 将 $\Phi^*_r$ 分解回细胞来源 $\sum w_k L_{k,r}$。
+* 如果 $\Phi^*_r$ 很高，且主要由成纤维细胞的配体贡献，则推断**成纤维细胞-肿瘤细胞互作**是导致肿瘤从“细胞系状态”向“组织状态”转变的主因。
 
